@@ -1,4 +1,4 @@
-# **Reproducible Research: Peer Assessment 1**
+# Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 
@@ -6,15 +6,7 @@
 library("lubridate")
 library("dplyr")
 library("ggplot2")
-library("knitr")
-```
-
-```
-## Warning: package 'knitr' was built under R version 3.2.3
-```
-
-```r
-data <- read.csv("activity.csv", header= TRUE, colClasses = "character")
+data <- read.csv(unz("activity.zip", "activity.csv"), header= TRUE, colClasses = "character")
 data$date <- ymd(data$date)
 data$steps <- as.numeric(data$steps)
 ```
@@ -29,17 +21,18 @@ stepsAday <- na.omit(data) %>%
   group_by(date) %>%
   summarize(Steps_Day = sum(steps))
 stepsAday <- data.frame(stepsAday)
-kable(head(stepsAday), align = "c")
+head(stepsAday)
 ```
 
-    date       Steps_Day 
-------------  -----------
- 2012-10-02       126    
- 2012-10-03      11352   
- 2012-10-04      12116   
- 2012-10-05      13294   
- 2012-10-06      15420   
- 2012-10-07      11015   
+```
+##         date Steps_Day
+## 1 2012-10-02       126
+## 2 2012-10-03     11352
+## 3 2012-10-04     12116
+## 4 2012-10-05     13294
+## 5 2012-10-06     15420
+## 6 2012-10-07     11015
+```
 
 > *Make a histogram of the total number of steps taken each day*
 
@@ -60,14 +53,13 @@ ggplot(stepsAday, aes(x=Steps_Day)) +
 
 ```r
 mean_median <- summarize(stepsAday, Steps_Day_mean = mean(Steps_Day), Steps_Day_median = median(Steps_Day))
-kable(mean_median, align = "c")
+mean_median
 ```
 
-
-
- Steps_Day_mean    Steps_Day_median 
-----------------  ------------------
-    10766.19            10765       
+```
+##   Steps_Day_mean Steps_Day_median
+## 1       10766.19            10765
+```
 
 ## What is the average daily activity pattern?
 
@@ -143,25 +135,33 @@ data$steps <- as.numeric(data$steps)
 data1 <- tbl_df(data) %>%
   group_by(date) %>%
   summarize(Steps_Day = sum(steps))
-kable(head(data1), align = "c")
+head(data1)
 ```
 
-    date       Steps_Day 
-------------  -----------
- 2012-10-01    10766.19  
- 2012-10-02     126.00   
- 2012-10-03    11352.00  
- 2012-10-04    12116.00  
- 2012-10-05    13294.00  
- 2012-10-06    15420.00  
+```
+## Source: local data frame [6 x 2]
+## 
+##         date Steps_Day
+##       (time)     (dbl)
+## 1 2012-10-01  10766.19
+## 2 2012-10-02    126.00
+## 3 2012-10-03  11352.00
+## 4 2012-10-04  12116.00
+## 5 2012-10-05  13294.00
+## 6 2012-10-06  15420.00
+```
 
 > *Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?*
 
 ![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
 
- Steps_Day_mean    Steps_Day_median 
-----------------  ------------------
-    10766.19           10766.19     
+```
+## Source: local data frame [1 x 2]
+## 
+##   Steps_Day_mean Steps_Day_median
+##            (dbl)            (dbl)
+## 1       10766.19         10766.19
+```
 
 The above median value **DOES** differ slightly from the estimates from the first part of the assignment, but the mean is the same. Imputing missing data on the estimates of the total daily number of steps increased the total daily number of steps, as one would expect since we are adding additional data in place of NAs. This difference is visible when looking at both histograms. The y-axis of the histogram created from data without replacing NAs has a smaller limit.
 
@@ -183,19 +183,18 @@ for(i in 1:nrow(data)){
   }
 }
   
-kable(head(data), align = "c")
+head(data)
 ```
 
-
-
-   steps         date       interval    wkday    daytype 
------------  ------------  ----------  -------  ---------
- 1.7169811    2012-10-01       0         Mon     weekday 
- 0.3396226    2012-10-01       5         Mon     weekday 
- 0.1320755    2012-10-01       10        Mon     weekday 
- 0.1509434    2012-10-01       15        Mon     weekday 
- 0.0754717    2012-10-01       20        Mon     weekday 
- 2.0943396    2012-10-01       25        Mon     weekday 
+```
+##       steps       date interval wkday daytype
+## 1 1.7169811 2012-10-01        0   Mon weekday
+## 2 0.3396226 2012-10-01        5   Mon weekday
+## 3 0.1320755 2012-10-01       10   Mon weekday
+## 4 0.1509434 2012-10-01       15   Mon weekday
+## 5 0.0754717 2012-10-01       20   Mon weekday
+## 6 2.0943396 2012-10-01       25   Mon weekday
+```
 
 > *Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).*
 
@@ -208,7 +207,8 @@ kable(head(data), align = "c")
  data$interval <- as.numeric(data$interval)
 
  ggplot(data, aes(interval, stepsM)) + 
-   facet_grid(.~ daytype) +
+   facet_grid(daytype~.) +
+   theme(strip.text.y = element_text(angle=0))+
    ggtitle("Steps per Interval for Day-type") +
    geom_line(aes(colour = daytype)) +
    theme(legend.position="none") 

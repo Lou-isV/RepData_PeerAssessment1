@@ -1,8 +1,8 @@
 ---
-title: "**Reproducible Research: Peer Assessment 1**"
+title: "Reproducible Research: Peer Assessment 1"
 output: 
   html_document:
-    keep_md: yes
+    keep_md: true
     theme: cerulean
 ---
 
@@ -11,8 +11,7 @@ output:
 library("lubridate")
 library("dplyr")
 library("ggplot2")
-library("knitr")
-data <- read.csv("activity.csv", header= TRUE, colClasses = "character")
+data <- read.csv(unz("activity.zip", "activity.csv"), header= TRUE, colClasses = "character")
 data$date <- ymd(data$date)
 data$steps <- as.numeric(data$steps)
 ```
@@ -26,7 +25,7 @@ stepsAday <- na.omit(data) %>%
   group_by(date) %>%
   summarize(Steps_Day = sum(steps))
 stepsAday <- data.frame(stepsAday)
-kable(head(stepsAday), align = "c")
+head(stepsAday)
 ```
 
 > *Make a histogram of the total number of steps taken each day*
@@ -44,7 +43,7 @@ ggplot(stepsAday, aes(x=Steps_Day)) +
 
 ```{r, echo=TRUE}
 mean_median <- summarize(stepsAday, Steps_Day_mean = mean(Steps_Day), Steps_Day_median = median(Steps_Day))
-kable(mean_median, align = "c")
+mean_median
 ```
 
 ## What is the average daily activity pattern?
@@ -105,7 +104,7 @@ data$steps <- as.numeric(data$steps)
 data1 <- tbl_df(data) %>%
   group_by(date) %>%
   summarize(Steps_Day = sum(steps))
-kable(head(data1), align = "c")
+head(data1)
 ```
 
 > *Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?*
@@ -117,7 +116,7 @@ ggplot(data1, aes(x=Steps_Day)) +
   theme(plot.title = element_text(lineheight=.8, face="bold"))
 
 mean_median <- summarize(data1, Steps_Day_mean = mean(Steps_Day), Steps_Day_median = median(Steps_Day)) 
-kable(mean_median, align = "c")
+mean_median
 ```
 
 The above median value **DOES** differ slightly from the estimates from the first part of the assignment, but the mean is the same. Imputing missing data on the estimates of the total daily number of steps increased the total daily number of steps, as one would expect since we are adding additional data in place of NAs. This difference is visible when looking at both histograms. The y-axis of the histogram created from data without replacing NAs has a smaller limit.
@@ -139,7 +138,7 @@ for(i in 1:nrow(data)){
   }
 }
   
-kable(head(data), align = "c")
+head(data)
 ```
 
 > *Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).*
@@ -152,7 +151,8 @@ kable(head(data), align = "c")
  data$interval <- as.numeric(data$interval)
 
  ggplot(data, aes(interval, stepsM)) + 
-   facet_grid(.~ daytype) +
+   facet_grid(daytype~.) +
+   theme(strip.text.y = element_text(angle=0))+
    ggtitle("Steps per Interval for Day-type") +
    geom_line(aes(colour = daytype)) +
    theme(legend.position="none") 
